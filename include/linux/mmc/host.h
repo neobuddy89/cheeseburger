@@ -598,6 +598,7 @@ struct mmc_host {
 	struct io_latency_state io_lat_s;
 #endif
 
+	bool sdr104_wa;
 	unsigned long		private[0] ____cacheline_aligned;
 };
 
