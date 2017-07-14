@@ -106,7 +106,19 @@ bool osq_lock(struct optimistic_spin_queue *lock)
 
 	prev = decode_cpu(old);
 	node->prev = prev;
-	smp_mb();
+
+	/*
+	 * osq_lock()			unqueue
+	 *
+	 * node->prev = prev		osq_wait_next()
+	 * WMB				MB
+	 * prev->next = node		next->prev = prev // unqueue-C
+	 *
+	 * Here 'node->prev' and 'next->prev' are the same variable and we need
+	 * to ensure these stores happen in-order to avoid corrupting the list.
+	 */
+	smp_wmb();
+
 	WRITE_ONCE(prev->next, node);
 
 	/*
@@ -121,7 +133,7 @@ bool osq_lock(struct optimistic_spin_queue *lock)
 	while (!READ_ONCE(node->locked)) {
 		/*
 		 * If we need to reschedule bail... so we can block.
-		 * If a task spins on owner on a CPU0 after acquiring
+		 * If a task spins on owner on a CPU after acquiring
 		 * osq_lock while a RT task spins on another CPU  to
 		 * acquire osq_lock, it will starve the owner from
 		 * completing if owner is to be scheduled on the same CPU.
