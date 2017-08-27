@@ -79,6 +79,9 @@ static int get_prop_fg_current_now(struct smb_charger *chg);
 static int get_prop_fg_voltage_now(struct smb_charger *chg);
 static void op_check_charger_collapse(struct smb_charger *chg);
 static int op_set_collapse_fet(struct smb_charger *chg, bool on);
+#ifdef CONFIG_DASH_SPOOF_CHARGE
+static void set_spoof_usb_fastcharge(void);
+#endif
 
 #define smblib_err(chg, fmt, ...)		\
 	pr_err("%s: %s: " fmt, chg->name,	\
@@ -5161,6 +5164,9 @@ static int set_dash_charger_present(int status)
 			g_chg->usb_psy_desc.type = POWER_SUPPLY_TYPE_DASH;
 			vote(g_chg->usb_icl_votable, PD_VOTER, true,
 					DEFAULT_WALL_CHG_MA * 1000);
+#ifdef CONFIG_DASH_SPOOF_CHARGE
+			set_spoof_usb_fastcharge();
+#endif
 		}
 		power_supply_changed(g_chg->batt_psy);
 		pr_info("dash_present = %d, charger_present = %d\n",
@@ -6945,3 +6951,26 @@ int smblib_deinit(struct smb_charger *chg)
 
 	return 0;
 }
+
+#ifdef CONFIG_DASH_SPOOF_CHARGE
+static void set_spoof_usb_fastcharge()
+{
+	int rc;
+	static struct power_supply *usb;
+	union power_supply_propval ret = {0, };
+
+	if (!usb) {
+		usb = power_supply_get_by_name("usb");
+        }
+	if (usb) {
+		ret.intval = 7500001;
+		rc = power_supply_set_property(usb, POWER_SUPPLY_PROP_CURRENT_MAX, &ret);
+		if (rc) {
+			pr_err("usb psy does not allow updating prop %d rc = %d\n",
+				POWER_SUPPLY_PROP_CURRENT_MAX, rc);
+		}
+	} else {
+		pr_err("no usb psy found\n");
+	}
+}
+#endif

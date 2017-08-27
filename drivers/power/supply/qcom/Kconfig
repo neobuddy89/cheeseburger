@@ -92,6 +92,12 @@ config QPNP_SMB2
 	help
 	  Enables support for the SMB2 charging peripheral
 
+config DASH_SPOOF_CHARGE
+	tristate "Spoof normal usb fastcharge"
+	depends on QPNP_SMB2
+	help
+	  Sets current max greater than 7500000
+
 config OP_DEBUG_CHG
 	tristate "OP DEBUG CHARGE"
 	depends on MFD_SPMI_PMIC
