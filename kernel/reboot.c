@@ -45,7 +45,9 @@ int reboot_cpu;
 enum reboot_type reboot_type = BOOT_ACPI;
 int reboot_force;
 
+#ifdef CONFIG_QCOM_DLOAD_MODE
 extern int oem_get_download_mode(void);
+#endif
 
 /*
  * If set, this is used for preparing the system to power off.
@@ -224,7 +226,7 @@ void kernel_restart(char *cmd)
 	else
 		pr_emerg("Restarting system with command '%s'\n", cmd);
 
-	
+#ifdef CONFIG_QCOM_DLOAD_MODE
 	if(oem_get_download_mode())
 	{
 		if (((cmd != NULL && cmd[0] != '\0') && !strcmp(cmd, "dm-verity device corrupted")))
@@ -234,6 +236,7 @@ void kernel_restart(char *cmd)
 		   msleep(10000);
 		}
 	}
+#endif
 
 	kmsg_dump(KMSG_DUMP_RESTART);
 	machine_restart(cmd);
