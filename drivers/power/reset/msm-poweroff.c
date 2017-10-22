@@ -308,10 +308,12 @@ static void msm_restart_prepare(const char *cmd)
 		need_warm_reset = (get_dload_mode() ||
 				(cmd != NULL && cmd[0] != '\0'));
 	}
+#ifdef CONFIG_QCOM_DLOAD_MODE
 	if (!download_mode &&
 			(in_panic || restart_mode == RESTART_DLOAD)) {
 		oem_panic_record = true;
 	}
+#endif
 	qpnp_pon_set_restart_reason(0x00);
 
 #ifdef CONFIG_QCOM_PRESERVE_MEM
