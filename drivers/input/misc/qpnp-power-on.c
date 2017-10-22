@@ -32,8 +32,9 @@
 #include <linux/regulator/of_regulator.h>
 #include <linux/syscalls.h>
 #include <linux/power/oem_external_fg.h>
-//hefaxi@filesystems, 2015/12/07, add for force dump function
+#ifdef CONFIG_OEM_FORCE_DUMP
 #include <linux/oem_force_dump.h>
+#endif
 #include <linux/input/qpnp-power-on.h>
 #include <linux/power_supply.h>
 
@@ -871,8 +872,9 @@ qpnp_pon_input_dispatch(struct qpnp_pon *pon, u32 pon_type)
 
 	cfg->old_state = !!key_status;
 
-//hefaxi@filesystems, 2015/07/03, add for force dump function
+#ifdef CONFIG_OEM_FORCE_DUMP
 	oem_check_force_dump_key(cfg->key_code,key_status);
+#endif
 
 	return 0;
 }

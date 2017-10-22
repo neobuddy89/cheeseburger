@@ -33,8 +33,10 @@
 #include <linux/spinlock.h>
 #include <linux/pinctrl/consumer.h>
 
-//hefaxi@filesystems, 2015/12/07, add for force dump function
+#ifdef CONFIG_OEM_FORCE_DUMP
 #include <linux/oem_force_dump.h>
+#endif
+
 struct gpio_button_data {
 	const struct gpio_keys_button *button;
 	struct input_dev *input;
@@ -354,8 +356,9 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 
 	state = (state ? 1 : 0) ^ button->active_low;
 
-//hefaxi@filesystems, 2015/12/07, add for force dump function
+#ifdef CONFIG_OEM_FORCE_DUMP
 	oem_check_force_dump_key(button->code,state);
+#endif
 
 	if (type == EV_ABS) {
 		if (state)
