@@ -17,7 +17,9 @@
 #include <linux/syscore_ops.h>
 #include <linux/uaccess.h>
 #include <linux/delay.h>
+#ifdef CONFIG_QCOM_DLOAD_MODE
 extern int oem_get_download_mode(void);
+#endif
 /*
  * this indicates whether you can reboot with ctrl-alt-del: the default is yes
  */
@@ -223,6 +225,7 @@ void kernel_restart(char *cmd)
 	else
 		pr_emerg("Restarting system with command '%s'\n", cmd);
 
+#ifdef CONFIG_QCOM_DLOAD_MODE
 	/*if enable dump, if dm-verity device corrupted, force enter dump */
 	if (oem_get_download_mode()) {
 		if (((cmd != NULL && cmd[0] != '\0') &&
@@ -232,6 +235,7 @@ void kernel_restart(char *cmd)
 			msleep(10000);
 		}
 	}
+#endif
 
 	kmsg_dump(KMSG_DUMP_RESTART);
 	machine_restart(cmd);
