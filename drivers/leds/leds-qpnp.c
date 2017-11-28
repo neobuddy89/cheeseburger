@@ -253,6 +253,11 @@
 /*taokai@bsp add for indicator shows when Mobile phone completely shut down*/
 static u8	shutdown_enable = 0;
 
+#ifdef CONFIG_LEDS_QPNP_RGB_SYNC_CONTROL
+static bool allow_rgb_sync = true;
+#else
+static bool allow_rgb_sync = false;
+#endif
 /**
  * enum qpnp_leds - QPNP supported led ids
  * @QPNP_ID_WLED - White led backlight
@@ -4075,7 +4080,7 @@ static int qpnp_leds_probe(struct platform_device *pdev)
 	if (!led_array)
 		return -ENOMEM;
 
-	if (of_property_read_bool(node, "qcom,rgb-sync")) {
+	if (of_property_read_bool(node, "qcom,rgb-sync") && allow_rgb_sync) {
 		rgb_sync = devm_kzalloc(&pdev->dev,
 			sizeof(struct rgb_sync), GFP_KERNEL);
 		if (!rgb_sync) {

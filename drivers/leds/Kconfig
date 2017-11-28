@@ -615,6 +615,12 @@ config LEDS_QPNP_WLED
 	  variable brightness.  It also supports outputting the Avdd supply for
 	  AMOLED displays.
 
+config LEDS_QPNP_RGB_SYNC_CONTROL
+	tristate "Support for QPNP WLED"
+	depends on LEDS_CLASS && SPMI
+	help
+	  This config enables configuring rgb sync control.
+
 config LEDS_SYSCON
 	bool "LED support for LEDs on system controllers"
 	depends on LEDS_CLASS=y
